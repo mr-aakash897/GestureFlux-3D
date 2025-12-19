@@ -2,7 +2,8 @@
 
 GestureFlux 3D is a real-time, gesture-controlled 3D particle visualization built for the web. It uses computer vision and WebGL to let users manipulate complex particle formations using natural hand movements captured through a webcam—no controllers or hardware required.<br>
 
-This project was created for fun and experimentation, with assistance from Google Studio AI, Perplexity, and ChatGPT, exploring the creative potential of AI-assisted development and real-time web graphics.
+This project was created for fun and experimentation, with assistance from Google Studio AI, Perplexity, and ChatGPT, exploring the creative potential of AI-assisted development and real-time web graphics.<br>
+Deployed link - https://a3n-gestureflex-3d.netlify.app/
 
 ## ✨ Features
 
