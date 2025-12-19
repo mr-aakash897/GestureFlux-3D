@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GestureFlux-3D: Evolution | Interactive Particle Physics</title>
+
+    <style>
+        :root { --accent: #00f2ff; --bg: #020205; --ui-panel: rgba(10, 10, 20, 0.7); }
+
+        body {
+            margin: 0; background: var(--bg); color: #fff;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            overflow: hidden; user-select: none;
+        }
+
+        canvas { display: block; position: fixed; top: 0; left: 0; z-index: 1; }
+
+        /* UI HUD */
+        #hud {
+            position: absolute; inset: 0; z-index: 10;
+            pointer-events: none; padding: 40px;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+
+        .top-left { border-left: 3px solid var(--accent); padding-left: 20px; }
+        
+        h1 {
+            margin: 0; font-weight: 200; letter-spacing: 15px;
+            text-transform: uppercase; font-size: 2.2rem;
+            text-shadow: 0 0 30px rgba(0, 242, 255, 0.4);
+        }
+
+        .status-box {
+            margin-top: 15px; background: var(--ui-panel);
+            backdrop-filter: blur(15px); padding: 20px;
+            border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+            display: inline-block; min-width: 300px; pointer-events: auto;
+        }
+
+        #gesture-hint { font-size: 0.85rem; letter-spacing: 1px; color: var(--accent); font-weight: 600; text-transform: uppercase; }
+        #description { font-size: 0.75rem; opacity: 0.5; margin-top: 10px; line-height: 1.5; }
+
+        /* Webcam HUD */
+        #webcam-monitor {
+            position: absolute; right: 40px; bottom: 40px;
+            width: 220px; height: 165px; border-radius: 12px;
+            overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            transform: scaleX(-1); z-index: 11; opacity: 0.7; transition: 0.3s;
+        }
+        #webcam-monitor:hover { opacity: 1; transform: scaleX(-1) scale(1.05); }
+        #webcam { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Fullscreen Loader */
+        #loader {
+            position: fixed; inset: 0; background: #000; z-index: 1000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 1s ease;
+        }
+        .loading-text { letter-spacing: 10px; font-size: 12px; opacity: 0.6; margin-top: 20px; }
+        .progress-bar { width: 150px; height: 1px; background: rgba(255,255,255,0.1); position: relative; margin-top: 15px; }
+        .progress-fill { position: absolute; left: 0; top: 0; height: 100%; background: var(--accent); width: 0%; transition: width 0.3s; }
+
+        /* Control Panel customization */
+        .lil-gui.root { top: 40px !important; right: 40px !important; z-index: 100; }
+
+        /* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    #hud { padding: 20px; }
+    
+    h1 { 
+        font-size: 1.5rem; 
+        letter-spacing: 8px; 
+    }
+    
+    .status-box { 
+        min-width: auto; 
+        padding: 15px; 
+        margin-top: 10px; 
+    }
+    
+    #gesture-hint { font-size: 0.75rem; }
+    #description { font-size: 0.7rem; }
+    
+    #webcam-monitor { 
+        width: 120px; 
+        height: 90px; 
+        right: 20px; 
+        bottom: 20px; 
+    }
+    
+    .lil-gui.root { 
+        top: 20px !important; 
+        right: 20px !important; 
+        transform: scale(0.8); 
+        transform-origin: top right; 
+    }
+}
+
+@media (max-width: 480px) {
+    #hud { padding: 15px; }
+    
+    h1 { 
+        font-size: 1.2rem; 
+        letter-spacing: 4px; 
+    }
+    
+    .status-box { padding: 12px; }
+    
+    #webcam-monitor { 
+        width: 100px; 
+        height: 75px; 
+        right: 15px; 
+        bottom: 15px; 
+    }
+    
+    .lil-gui.root { 
+        transform: scale(0.7); 
+    }
+}
+
+@media (max-width: 320px) {
+    #hud { padding: 10px; }
+    
+    h1 { 
+        font-size: 1rem; 
+        letter-spacing: 2px; 
+    }
+    
+    .status-box { 
+        padding: 10px; 
+        font-size: 0.8rem; 
+    }
+    
+    #webcam-monitor { 
+        width: 80px; 
+        height: 60px; 
+        right: 10px; 
+        bottom: 10px; 
+    }
+}
+
+/* Landscape mobile orientation */
+@media (max-height: 500px) and (orientation: landscape) {
+    #hud { padding: 10px; }
+    
+    h1 { font-size: 1rem; }
+    
+    .status-box { 
+        padding: 8px; 
+        margin-top: 5px; 
+    }
+    
+    #webcam-monitor { 
+        width: 80px; 
+        height: 60px; 
+        right: 10px; 
+        bottom: 10px; 
+    }
+}
+    </style>
+</head>
+
+<body>
+
+<div id="loader">
+    <h1 style="font-size: 3rem;">GestureFlux-3D</h1>
+    <div class="progress-bar"><div id="load-progress" class="progress-fill"></div></div>
+    <div class="loading-text">SYNCING GEOMETRIES</div>
+</div>
+
+<div id="hud">
+    <div class="top-left">
+        <h1>GestureFlux-3D</h1>
+        <div class="status-box">
+            <div id="gesture-hint">Initializing Optical Neural Link...</div>
+            <div id="description">Show your hand to the camera. Pinch to compress space, open your hand to expand it.</div>
+        </div>
+    </div>
+</div>
+
+<div id="webcam-monitor">
+    <video id="webcam" autoplay playsinline></video>
+</div>
+
+<!-- Dependency Mapping -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from "three";
+import { GUI } from "three/addons/libs/lil-gui.module.min.js";
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { HandLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
+
+/* -----------------------------------------------------------
+   CONFIG & STATE
+----------------------------------------------------------- */
+const P_COUNT = 20000;
+const state = {
+    template: 'Singularity',
+    color: '#00f2ff',
+    particleSize: 0.12,
+    morphSpeed: 0.07,
+    rotationSpeed: 0.5,
+    exposure: 1.0,
+    bloomStrength: 1.2,
+    handTension: 1.0 // This tracks gesture expansion
+};
+
+let scene, camera, renderer, points, geometry, material, composer;
+let video, handLandmarker, lastVideoTime = -1;
+const targets = new Float32Array(P_COUNT * 3);
+
+/* -----------------------------------------------------------
+   12 IMPRESSIVE PATTERN GENERATORS
+----------------------------------------------------------- */
+const Patterns = {
+    Singularity(i) {
+        if (i < P_COUNT * 0.8) {
+            const r = 3 + Math.pow(Math.random(), 2) * 15;
+            const a = Math.random() * Math.PI * 2;
+            const h = (1 / r) * (Math.random() - 0.5) * 8;
+            return new THREE.Vector3(Math.cos(a) * r, h, Math.sin(a) * r);
+        }
+        return new THREE.Vector3((Math.random()-0.5)*0.5, (Math.random()-0.5)*35, (Math.random()-0.5)*0.5);
+    },
+    DNA(i) {
+        const spiral = i % 2 === 0 ? 1 : -1;
+        const y = (i / P_COUNT) * 30 - 15;
+        const angle = y * 1.2 + (spiral === 1 ? 0 : Math.PI);
+        const r = 6;
+        if (i % 30 === 0) return new THREE.Vector3((Math.random()-0.5)*r*2, y, 0); // Bridges
+        return new THREE.Vector3(Math.cos(angle) * r, y, Math.sin(angle) * r);
+    },
+    TripleDNA(i) {
+        const strand = i % 3;
+        const y = (i / P_COUNT) * 24 - 12;
+        const angle = y * 1.2 + (strand * Math.PI * 0.66);
+        return new THREE.Vector3(Math.cos(angle)*6, y, Math.sin(angle)*6);
+    },
+    LorenzChaos(i) {
+        const t = (i / P_COUNT) * 100;
+        const x = 10 * Math.sin(t * 0.5);
+        const y = 15 * Math.cos(t * 0.3) * Math.sin(t * 0.2);
+        const z = 10 * Math.cos(t * 0.8);
+        return new THREE.Vector3(x, y, z);
+    },
+    HyperSphere(i) {
+        const layer = Math.floor((i / P_COUNT) * 4);
+        const r = (layer + 1) * 4;
+        const u = Math.random(), v = Math.random();
+        const theta = 2 * Math.PI * u, phi = Math.acos(2 * v - 1);
+        return new THREE.Vector3(r * Math.sin(phi) * Math.cos(theta), r * Math.sin(phi) * Math.sin(theta), r * Math.cos(phi));
+    },
+    Mobius(i) {
+        const u = (i / P_COUNT) * Math.PI * 2;
+        const v = (Math.random() - 0.5) * 5;
+        const a = 12;
+        return new THREE.Vector3(
+            (a + v * Math.cos(u / 2)) * Math.cos(u),
+            (a + v * Math.cos(u / 2)) * Math.sin(u),
+            v * Math.sin(u / 2)
+        );
+    },
+    Vortex(i) {
+        const r = (i / P_COUNT) * 15;
+        const angle = i * 0.05;
+        return new THREE.Vector3(Math.cos(angle)*r, (Math.random()-0.5)*r, Math.sin(angle)*r);
+    },
+    DigitalIris(i) {
+        const ring = i % 10; 
+        const r = 2 + (ring * 1.2) + Math.random() * 0.5;
+        const angle = (i / P_COUNT) * Math.PI * 150;
+        const x = Math.cos(angle) * r;
+        const y = Math.sin(angle) * r;
+        // Central depth logic
+        const z = (ring < 2) ? (Math.random() - 0.5) * 5 : (Math.random() - 0.5);
+        return new THREE.Vector3(x, y, z);
+    },
+    CyberBrain(i) {
+        const side = i % 2 === 0 ? 1 : -1;
+        const y = (Math.random()-0.5)*12;
+        const r = Math.pow(Math.random(), 0.5) * 8;
+        const t = Math.random()*Math.PI*2;
+        return new THREE.Vector3(Math.cos(t)*r + (6 * side), y, Math.sin(t)*r);
+    },
+    Galaxy(i) {
+        const r = Math.pow(Math.random(), 0.5) * 18;
+        const angle = r * 0.8 + (i % 3) * (Math.PI * 2 / 3);
+        const noise = (Math.random()-0.5) * 2;
+        return new THREE.Vector3(Math.cos(angle)*r + noise, (Math.random()-0.5)*1.5, Math.sin(angle)*r + noise);
+    },
+    Lotus(i) {
+        const t = Math.random() * Math.PI * 2;
+        const p = Math.random() * Math.PI;
+        const r = 8 * (1 + 0.3 * Math.sin(6 * t)) * Math.sin(p);
+        return new THREE.Vector3(r * Math.sin(p) * Math.cos(t), r * Math.cos(p), r * Math.sin(p) * Math.sin(t));
+    },
+    Starfield(i) {
+        return new THREE.Vector3((Math.random()-0.5)*50, (Math.random()-0.5)*50, (Math.random()-0.5)*50);
+    },
+    TorusNode(i) {
+        const u = (i / P_COUNT) * Math.PI * 2;
+        const v = (i / P_COUNT) * Math.PI * 10;
+        const r = 10 + 3 * Math.cos(v);
+        return new THREE.Vector3(r * Math.cos(u), 3 * Math.sin(v), r * Math.sin(u));
+    },
+    Cylinder(i) {
+        const h = (Math.random()-0.5)*20;
+        const a = Math.random() * Math.PI * 2;
+        const r = 8;
+        return new THREE.Vector3(Math.cos(a)*r, h, Math.sin(a)*r);
+    },
+    Heart(i) {
+        const t = Math.random() * Math.PI * 2;
+        const x = 16 * Math.pow(Math.sin(t), 3);
+        const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+        return new THREE.Vector3(x * 0.45, y * 0.45, (Math.random() - 0.5) * 5);
+    }
+};
+
+/* -----------------------------------------------------------
+   CORE ENGINE
+----------------------------------------------------------- */
+async function init() {
+    // 1. Scene Setup
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 1000);
+    camera.position.z = 40;
+
+    renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    document.body.appendChild(renderer.domElement);
+
+    // 2. Post-Processing (Quantum Glow)
+    const renderScene = new RenderPass(scene, camera);
+    const bloomPass = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), state.bloomStrength, 0.4, 0.1);
+    composer = new EffectComposer(renderer);
+    composer.addPass(renderScene);
+    composer.addPass(bloomPass);
+    composer.addPass(new OutputPass());
+
+    // 3. Particles
+    geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.BufferAttribute(new Float32Array(P_COUNT * 3), 3));
+
+    material = new THREE.PointsMaterial({
+        size: state.particleSize,
+        color: state.color,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        map: createPointTexture(),
+        opacity: 0.8
+    });
+
+    points = new THREE.Points(geometry, material);
+    scene.add(points);
+
+    // 4. GUI & Input
+    updateTemplate(state.template);
+    initGUI();
+    await initMediaPipe();
+
+    // Fade Out Loader
+    document.getElementById("load-progress").style.width = "100%";
+    setTimeout(() => {
+        document.getElementById("loader").style.opacity = "0";
+        setTimeout(() => document.getElementById("loader").remove(), 1000);
+    }, 500);
+
+    animate();
+}
+
+function createPointTexture() {
+    const canvas = document.createElement("canvas");
+    canvas.width = 64; canvas.height = 64;
+    const ctx = canvas.getContext("2d");
+    const grad = ctx.createRadialGradient(32,32,0, 32,32,32);
+    grad.addColorStop(0, 'rgba(255,255,255,1)');
+    grad.addColorStop(0.2, 'rgba(255,255,255,0.6)');
+    grad.addColorStop(0.5, 'rgba(255,255,255,0.05)');
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0,0,64,64);
+    return new THREE.CanvasTexture(canvas);
+}
+
+function updateTemplate(name) {
+    const gen = Patterns[name];
+    for (let i = 0; i < P_COUNT; i++) {
+        const v = gen(i);
+        targets[i * 3] = v.x;
+        targets[i * 3 + 1] = v.y;
+        targets[i * 3 + 2] = v.z;
+    }
+}
+
+async function initMediaPipe() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video = document.getElementById("webcam");
+        video.srcObject = stream;
+
+        const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm");
+        handLandmarker = await HandLandmarker.createFromOptions(vision, {
+            baseOptions: { 
+                modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+                delegate: "GPU" 
+            },
+            runningMode: "VIDEO", numHands: 1
+        });
+        document.getElementById("load-progress").style.width = "80%";
+    } catch (e) {
+        document.getElementById("gesture-hint").innerText = "Vision System Offline";
+        document.getElementById("gesture-hint").style.color = "#ff4444";
+    }
+}
+
+function handleGestures(res) {
+    const hint = document.getElementById("gesture-hint");
+    if (res.landmarks && res.landmarks.length > 0) {
+        const hand = res.landmarks[0];
+        // Calculate Distance between Thumb Tip (4) and Index Tip (8)
+        const d = Math.sqrt(
+            Math.pow(hand[4].x - hand[8].x, 2) + 
+            Math.pow(hand[4].y - hand[8].y, 2)
+        );
+        // Map 0.05 - 0.35 range to 0.4x - 4.0x scale
+        const targetTension = THREE.MathUtils.mapLinear(d, 0.05, 0.35, 0.4, 3.5);
+        state.handTension = THREE.MathUtils.lerp(state.handTension, targetTension, 0.2);
+        
+        hint.innerText = d > 0.15 ? "Pulse Detected: Expanding" : "Pulse Detected: Compressing";
+        hint.style.color = "var(--accent)";
+    } else {
+        state.handTension = THREE.MathUtils.lerp(state.handTension, 1.0, 0.05);
+        hint.innerText = "Scanning for Hands...";
+        hint.style.color = "rgba(255,255,255,0.3)";
+    }
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    if (video && handLandmarker && video.readyState >= 2 && video.currentTime !== lastVideoTime) {
+        lastVideoTime = video.currentTime;
+        const res = handLandmarker.detectForVideo(video, performance.now());
+        handleGestures(res);
+    }
+
+    const pos = geometry.attributes.position.array;
+    for (let i = 0; i < P_COUNT; i++) {
+        const i3 = i * 3;
+        // Morph + Hand Interaction
+        pos[i3] += (targets[i3] * state.handTension - pos[i3]) * state.morphSpeed;
+        pos[i3+1] += (targets[i3+1] * state.handTension - pos[i3+1]) * state.morphSpeed;
+        pos[i3+2] += (targets[i3+2] * state.handTension - pos[i3+2]) * state.morphSpeed;
+    }
+    geometry.attributes.position.needsUpdate = true;
+
+    points.rotation.y += 0.003 * state.rotationSpeed;
+    points.rotation.x += 0.001 * state.rotationSpeed;
+
+    composer.render();
+}
+
+function initGUI() {
+    const gui = new GUI();
+    gui.add(state, "template", Object.keys(Patterns)).name("Geometry").onChange(updateTemplate);
+    gui.addColor(state, "color").name("Quantum Color").onChange(c => material.color.set(c));
+    gui.add(state, "particleSize", 0.01, 0.5).name("Point Scale");
+    gui.add(state, "morphSpeed", 0.01, 0.2).name("Elasticity");
+    
+    const fx = gui.addFolder("Glow Engine");
+    fx.add(state, "bloomStrength", 0, 3).name("Brightness").onChange(v => composer.passes[1].strength = v);
+    fx.add(state, "rotationSpeed", 0, 2).name("Orbit");
+}
+
+addEventListener("resize", () => {
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+    composer.setSize(innerWidth, innerHeight);
+});
+
+init();
+</script>
+</body>
+</html>
