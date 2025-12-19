@@ -1,54 +1,73 @@
 # GestureFlux 3D
 
-GestureFlux 3D is a real-time, gesture-controlled 3D particle visualization built for the web. It uses computer vision and WebGL to let users manipulate complex particle formations using natural hand movements captured through a webcam—no controllers or hardware required.<br>
+GestureFlux 3D is a real-time, gesture-controlled 3D particle visualization built for the web. It uses computer vision and WebGL to let users manipulate complex particle formations using natural hand movements captured through a webcam—no controllers or hardware required.
 
 ## ✨ Features
 
-<li><ul>One-Hand Gesture Control<br>
--Thumb + index finger pinch controls particle scale (expand / contract)<br>
--Finger movement controls rotation and motion<br></ul>
+One-Hand Gesture Control
 
-<ul>Real-Time 3D Particle System<br>
--Powered by Three.js<br>
--Smooth animations with low latency<br></ul>
+Thumb + index finger pinch controls particle scale (expand / contract)
 
-<ul>Multiple Particle Templates<br>
--Hearts<br>
--Flowers<br>
--Saturn Rings<br>
--Buddha Form<br>
--Fireworks<br></ul>
+Finger movement controls rotation and motion
 
-<ul>Live Color Customization<br>
--Change particle colors instantly using a color picker<br></ul>
+Real-Time 3D Particle System
 
-<ul>Modern, Minimal Interface<br>
--Clean UI overlay<br>
--Webcam preview with mirrored view<br>
--Performance-optimized rendering<br></ul><li>
+Powered by Three.js
+
+Smooth animations with low latency
+
+Multiple Particle Templates
+
+Hearts
+
+Flowers
+
+Saturn Rings
+
+Buddha Form
+
+Fireworks
+
+Live Color Customization
+
+Change particle colors instantly using a color picker
+
+Modern, Minimal Interface
+
+Clean UI overlay
+
+Webcam preview with mirrored view
+
+Performance-optimized rendering
 
 ## 🧠 How It Works
 
-<li><ul>Camera Capture<br>
-The browser accesses your webcam to capture live video frames.<br></ul>
+Camera Capture
+The browser accesses your webcam to capture live video frames.
 
-<ul>Hand Tracking<br>
--MediaPipe detects hand landmarks (thumb, index finger, etc.) in real time.</ul><br>
+Hand Tracking
+MediaPipe detects hand landmarks (thumb, index finger, etc.) in real time.
 
-<ul>Gesture Recognition<br>
--Distance between thumb and index finger determines particle expansion
--Finger movement affects rotation and dynamics</ul><br>
+Gesture Recognition
 
-<ul>Particle Response<br>
--The 3D particle system updates instantly based on gesture input.</ul></li>
+Distance between thumb and index finger determines particle expansion
+
+Finger movement affects rotation and dynamics
+
+Particle Response
+The 3D particle system updates instantly based on gesture input.
 
 ## 🛠 Tech Stack
 
-<ul>Three.js — 3D rendering (WebGL)</ul>
-<ul>MediaPipe Hands — Real-time hand tracking</ul>
-<ul>JavaScript (ES Modules)</ul>
-<ul>HTML5 + CSS3</ul>
-<ul>Web APIs (getUserMedia)</ul>
+Three.js — 3D rendering (WebGL)
+
+MediaPipe Hands — Real-time hand tracking
+
+JavaScript (ES Modules)
+
+HTML5 + CSS3
+
+Web APIs (getUserMedia)
 
 ## 🚀 How to Run
 
@@ -59,41 +78,43 @@ The browser accesses your webcam to capture live video frames.<br></ul>
 Open index.html → Right-click → "Open with Live Server"
 
 #### OR using Python
-python -m http.server<br>
+python -m http.server
 
 
-Then open:<br>
-http://localhost:8000<br>
+Then open:
+
+http://localhost:8000
 
 ### Option 2: Deploy Online
 
 #### Deploy using:
-<ul>Netlify</ul>
-<ul>Vercel</ul>
-<ul>GitHub Pages (with HTTPS)</ul>
+
+Netlify
+
+Vercel
+
+GitHub Pages (with HTTPS)
 
 ## 🖐 How to Use Gestures
-#### Gesture	-> Action
-<ul>Thumb + Index close	-> Contract particles</ul>
-<ul>Thumb + Index spread -> Expand particles</ul>
-<ul>Finger movement ->	Rotate particle system</ul>
-<ul>GUI panel -> Change template, color, size</ul>
+Gesture	Action
+Thumb + Index close	-> Contract particles
+Thumb + Index spread -> Expand particles
+Finger movement ->	Rotate particle system
+GUI panel -> Change template, color, size
 
 #### Use one hand, keep it clearly visible in the camera frame.
 
 ## ⚠️ Requirements
 
-<ul>Desktop or laptop with webcam</ul>
-<ul>Modern browser (Chrome / Edge recommended)</ul>
-<ul>Good lighting for accurate hand tracking</ul>
+<ul><li>Desktop or laptop with webcam</li>
+
+<li>Modern browser (Chrome / Edge recommended)</li>
+
+<li>Good lighting for accurate hand tracking</li></ul>
 
 ## 📌 Known Limitations
 
-<ul>Works best in good lighting</ul>
-<ul>Mobile browsers may have limited performance</ul>
-<ul>Requires camera permission</ul>
+<ul><li>Works best in good lighting</li>
+<li>Mobile browsers may have limited performance</li>
+<li>Requires camera permission</li></ul>
 
-## 👤 Author
-
-Aakash Chouhan<br>
-Software Developer | Web & 3D Experiences
