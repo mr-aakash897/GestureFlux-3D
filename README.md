@@ -54,23 +54,7 @@ GestureFlux 3D is a real-time, gesture-controlled 3D particle visualization buil
 
 ### ⚠️ Webcam access requires HTTPS or localhost
 
-### Option 1: Local Server (Recommended)
-#### Using VS Code Live Server
 <li>Open index.html → Right-click → "Open with Live Server"</li>
-
-#### OR using Python
-<li>python -m http.server<br></li>
-
-<li>Then open:<br>
-http://localhost:8000</li>
-
-### Option 2: Deploy Online
-
-#### Deploy using:
-
-<ul><li>Netlify</li>
-<li>Vercel</li>
-<li>GitHub Pages (with HTTPS)</li></ul>
 
 ## 🖐 How to Use Gestures
 <ul><li>Gesture	Action</li>
