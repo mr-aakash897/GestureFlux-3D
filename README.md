@@ -42,32 +42,26 @@ Performance-optimized rendering
 
 ## 🧠 How It Works
 
-Camera Capture
-The browser accesses your webcam to capture live video frames.
+<ul><li>Camera Capture<br>
+-The browser accesses your webcam to capture live video frames.</li>
 
-Hand Tracking
-MediaPipe detects hand landmarks (thumb, index finger, etc.) in real time.
+<li>Hand Tracking<br>
+-MediaPipe detects hand landmarks (thumb, index finger, etc.) in real time.</li>
 
-Gesture Recognition
+<li>Gesture Recognition<br>
+-Distance between thumb and index finger determines particle expansion<br>
+-Finger movement affects rotation and dynamics</li>
 
-Distance between thumb and index finger determines particle expansion
-
-Finger movement affects rotation and dynamics
-
-Particle Response
-The 3D particle system updates instantly based on gesture input.
+<li>Particle Response<br>
+-The 3D particle system updates instantly based on gesture input.</li></ul>
 
 ## 🛠 Tech Stack
 
-Three.js — 3D rendering (WebGL)
-
-MediaPipe Hands — Real-time hand tracking
-
-JavaScript (ES Modules)
-
-HTML5 + CSS3
-
-Web APIs (getUserMedia)
+<ul><li>Three.js — 3D rendering (WebGL)</li>
+<li>MediaPipe Hands — Real-time hand tracking</li>
+<li>JavaScript (ES Modules)</li>
+<li>HTML5 + CSS3</li>
+<li>Web APIs (getUserMedia)</li></ul>
 
 ## 🚀 How to Run
 
@@ -75,41 +69,35 @@ Web APIs (getUserMedia)
 
 ### Option 1: Local Server (Recommended)
 #### Using VS Code Live Server
-Open index.html → Right-click → "Open with Live Server"
+<li>Open index.html → Right-click → "Open with Live Server"</li>
 
 #### OR using Python
-python -m http.server
+<li>python -m http.server<br></li>
 
-
-Then open:
-
-http://localhost:8000
+<li>Then open:<br>
+http://localhost:8000</li>
 
 ### Option 2: Deploy Online
 
 #### Deploy using:
 
-Netlify
-
-Vercel
-
-GitHub Pages (with HTTPS)
+<ul><li>Netlify</li>
+<li>Vercel</li>
+<li>GitHub Pages (with HTTPS)</li></ul>
 
 ## 🖐 How to Use Gestures
-Gesture	Action
-Thumb + Index close	-> Contract particles
-Thumb + Index spread -> Expand particles
-Finger movement ->	Rotate particle system
-GUI panel -> Change template, color, size
+<ul><li>Gesture	Action</li>
+<li>Thumb + Index close	-> Contract particles</li>
+<li>Thumb + Index spread -> Expand particles</li>
+<li>Finger movement ->	Rotate particle system</li>
+<li>GUI panel -> Change template, color, size</li></ul>
 
 #### Use one hand, keep it clearly visible in the camera frame.
 
 ## ⚠️ Requirements
 
 <ul><li>Desktop or laptop with webcam</li>
-
 <li>Modern browser (Chrome / Edge recommended)</li>
-
 <li>Good lighting for accurate hand tracking</li></ul>
 
 ## 📌 Known Limitations
