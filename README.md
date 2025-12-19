@@ -4,41 +4,28 @@ GestureFlux 3D is a real-time, gesture-controlled 3D particle visualization buil
 
 ## ✨ Features
 
-One-Hand Gesture Control
+<ul><li>One-Hand Gesture Control<br>
+-Thumb + index finger pinch controls particle scale (expand / contract)<br>
+-Finger movement controls rotation and motion</li>
 
-Thumb + index finger pinch controls particle scale (expand / contract)
+<li>Real-Time 3D Particle System<br>
+-Powered by Three.js<br>
+-Smooth animations with low latency</li>
 
-Finger movement controls rotation and motion
+<li>Multiple Particle Templates<br>
+-Hearts<br>
+-Flowers<br>
+-Saturn Rings<br>
+-Buddha Form<br>
+-Fireworks</li>
 
-Real-Time 3D Particle System
+<li>Live Color Customization<br>
+-Change particle colors instantly using a color picker</li>
 
-Powered by Three.js
-
-Smooth animations with low latency
-
-Multiple Particle Templates
-
-Hearts
-
-Flowers
-
-Saturn Rings
-
-Buddha Form
-
-Fireworks
-
-Live Color Customization
-
-Change particle colors instantly using a color picker
-
-Modern, Minimal Interface
-
-Clean UI overlay
-
-Webcam preview with mirrored view
-
-Performance-optimized rendering
+<li>Modern, Minimal Interface<br>
+-Clean UI overlay<br>
+-Webcam preview with mirrored view<br>
+-Performance-optimized rendering</li></ul>
 
 ## 🧠 How It Works
 
@@ -106,3 +93,7 @@ http://localhost:8000</li>
 <li>Mobile browsers may have limited performance</li>
 <li>Requires camera permission</li></ul>
 
+## 👤 Author
+
+Aakash Chouhan<br>
+Software Developer | Web & 3D Experiences
