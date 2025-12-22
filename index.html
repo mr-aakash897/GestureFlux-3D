@@ -226,14 +226,65 @@ const targets = new Float32Array(P_COUNT * 3);
    12 IMPRESSIVE PATTERN GENERATORS
 ----------------------------------------------------------- */
 const Patterns = {
-    Singularity(i) {
-        if (i < P_COUNT * 0.8) {
-            const r = 3 + Math.pow(Math.random(), 2) * 15;
-            const a = Math.random() * Math.PI * 2;
-            const h = (1 / r) * (Math.random() - 0.5) * 8;
-            return new THREE.Vector3(Math.cos(a) * r, h, Math.sin(a) * r);
+        Singularity(i) {
+        const r = 4 + Math.pow(Math.random(), 3) * 25, a = Math.random() * Math.PI * 2;
+        return new THREE.Vector3(Math.cos(a)*r, (1/r)*(Math.random()-0.5)*15, Math.sin(a)*r);
+    },
+        CosmicPalace(i) {
+        const p = new THREE.Vector3();
+        
+        // Define Partition Sizes
+        const pillarsLimit = P_COUNT * 0.3;     // 30% Structural Pillars
+        const roomsLimit = P_COUNT * 0.7;       // 40% Memory Chambers
+        const corridorLimit = P_COUNT * 0.9;    // 20% Connective Bridges
+        // 10% Residual Memory Dust
+
+        if (i < pillarsLimit) {
+            // THE PILLARS (Columns of Light)
+            const pillarIdx = i % 12; // 12 columns
+            const height = (Math.random() - 0.5) * 40;
+            const radius = 0.5 + Math.random() * 1.5;
+            const angle = (pillarIdx / 12) * Math.PI * 2;
+            const px = Math.cos(angle) * (15 + pillarIdx);
+            const pz = Math.sin(angle) * (15 + pillarIdx);
+            
+            p.set(px + (Math.random() - 0.5) * radius, height, pz + (Math.random() - 0.5) * radius);
+
+        } else if (i < roomsLimit) {
+            // THE CHAMBERS (Holographic Rooms)
+            const roomId = i % 6; // 6 main rooms
+            if (!roomCenters[roomId]) {
+                roomCenters[roomId] = new THREE.Vector3((Math.random()-0.5)*35, (Math.random()-0.5)*25, (Math.random()-0.5)*20);
+            }
+            const center = roomCenters[roomId];
+            const volume = 8;
+            p.set(
+                center.x + (Math.random()-0.5)*volume, 
+                center.y + (Math.random()-0.5)*volume, 
+                center.z + (Math.random()-0.5)*volume
+            );
+
+        } else if (i < corridorLimit) {
+            // CONNECTIVE BRIDGES (Data Paths between rooms)
+            const r1 = i % 6;
+            const r2 = (i + 1) % 6;
+            const alpha = Math.random(); // Position along the path
+            const start = roomCenters[r1];
+            const end = roomCenters[r2];
+            
+            // Linear interpolation with wave distortion
+            const pathX = start.x + (end.x - start.x) * alpha;
+            const pathY = start.y + (end.y - start.y) * alpha;
+            const pathZ = start.z + (end.z - start.z) * alpha;
+            const noise = Math.sin(alpha * 15 + Date.now() * 0.002) * 1.5;
+            p.set(pathX + noise, pathY + noise, pathZ + noise);
+
+        } else {
+            // COSMIC DUST (Deep Ambient Context)
+            const range = 50;
+            p.set((Math.random()-0.5)*range, (Math.random()-0.5)*range, (Math.random()-0.5)*range);
         }
-        return new THREE.Vector3((Math.random()-0.5)*0.5, (Math.random()-0.5)*35, (Math.random()-0.5)*0.5);
+        return p;
     },
     DNA(i) {
         const spiral = i % 2 === 0 ? 1 : -1;
@@ -242,19 +293,6 @@ const Patterns = {
         const r = 6;
         if (i % 30 === 0) return new THREE.Vector3((Math.random()-0.5)*r*2, y, 0); // Bridges
         return new THREE.Vector3(Math.cos(angle) * r, y, Math.sin(angle) * r);
-    },
-    TripleDNA(i) {
-        const strand = i % 3;
-        const y = (i / P_COUNT) * 24 - 12;
-        const angle = y * 1.2 + (strand * Math.PI * 0.66);
-        return new THREE.Vector3(Math.cos(angle)*6, y, Math.sin(angle)*6);
-    },
-    LorenzChaos(i) {
-        const t = (i / P_COUNT) * 100;
-        const x = 10 * Math.sin(t * 0.5);
-        const y = 15 * Math.cos(t * 0.3) * Math.sin(t * 0.2);
-        const z = 10 * Math.cos(t * 0.8);
-        return new THREE.Vector3(x, y, z);
     },
     HyperSphere(i) {
         const layer = Math.floor((i / P_COUNT) * 4);
@@ -288,13 +326,6 @@ const Patterns = {
         const z = (ring < 2) ? (Math.random() - 0.5) * 5 : (Math.random() - 0.5);
         return new THREE.Vector3(x, y, z);
     },
-    CyberBrain(i) {
-        const side = i % 2 === 0 ? 1 : -1;
-        const y = (Math.random()-0.5)*12;
-        const r = Math.pow(Math.random(), 0.5) * 8;
-        const t = Math.random()*Math.PI*2;
-        return new THREE.Vector3(Math.cos(t)*r + (6 * side), y, Math.sin(t)*r);
-    },
     Galaxy(i) {
         const r = Math.pow(Math.random(), 0.5) * 18;
         const angle = r * 0.8 + (i % 3) * (Math.PI * 2 / 3);
@@ -310,12 +341,6 @@ const Patterns = {
     Starfield(i) {
         return new THREE.Vector3((Math.random()-0.5)*50, (Math.random()-0.5)*50, (Math.random()-0.5)*50);
     },
-    TorusNode(i) {
-        const u = (i / P_COUNT) * Math.PI * 2;
-        const v = (i / P_COUNT) * Math.PI * 10;
-        const r = 10 + 3 * Math.cos(v);
-        return new THREE.Vector3(r * Math.cos(u), 3 * Math.sin(v), r * Math.sin(u));
-    },
     Cylinder(i) {
         const h = (Math.random()-0.5)*20;
         const a = Math.random() * Math.PI * 2;
@@ -327,6 +352,252 @@ const Patterns = {
         const x = 16 * Math.pow(Math.sin(t), 3);
         const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
         return new THREE.Vector3(x * 0.45, y * 0.45, (Math.random() - 0.5) * 5);
+    },
+        /* 19. EVENT HORIZON CHOIR (The Harmonic Well) */
+    EventHorizonChoir(i) {
+        const p = new THREE.Vector3();
+        
+        // Distribution: 15% Divine Core, 85% Resonating Rings
+        const isCore = i < P_COUNT * 0.15;
+
+        if (isCore) {
+            // THE DIVINE CORE: High-density light source
+            const u = Math.random(), v = Math.random();
+            const theta = 2 * Math.PI * u, phi = Math.acos(2 * v - 1);
+            const r = Math.pow(Math.random(), 2) * 6; // Concentrated center
+            p.set(
+                r * Math.sin(phi) * Math.cos(theta),
+                r * Math.sin(phi) * Math.sin(theta),
+                r * Math.cos(phi)
+            );
+        } else {
+            // THE HARMONIC RINGS: Concentric energy fields
+            const ringCount = 10;
+            const ringIndex = i % ringCount; 
+            
+            // Base ring math
+            const radius = 10 + (ringIndex * 2.5);
+            const angle = (i / P_COUNT) * Math.PI * 150; // Densely packed along the perimeter
+            
+            const bx = Math.cos(angle) * radius;
+            const bz = Math.sin(angle) * radius;
+
+            // WAVE OSCILLATION: The "Singing" effect
+            // We use the timestamp to create movement, and ringIndex to phase-shift the harmony
+            const time = Date.now() * 0.002;
+            const frequency = 3 + (ringIndex * 0.5); // Each ring "sings" at a higher pitch
+            
+            // Vertical sound wave oscillation
+            const waveY = Math.sin(angle * frequency + time + ringIndex) * 2.0;
+
+            // Ripple distortion (Radial Pulse)
+            const ripple = Math.cos(angle * 2 + time) * 0.5;
+
+            p.set(
+                bx + (bx * ripple * 0.1), 
+                waveY, 
+                bz + (bz * ripple * 0.1)
+            );
+        }
+
+        return p;
+    },
+    CelestialGate(i) {
+        const p = new THREE.Vector3();
+        const rand = Math.random();
+        
+        if (i < P_COUNT * 0.4) {
+            // 40%: The Core Vortex (Hyper-spiral)
+            const ratio = i / (P_COUNT * 0.4);
+            const angle = ratio * Math.PI * 40;
+            const r = Math.pow(ratio, 0.5) * 8;
+            const depth = (1 - ratio) * 15;
+            p.set(Math.cos(angle) * r, Math.sin(angle) * r, depth - 7.5);
+
+        } else if (i < P_COUNT * 0.8) {
+            // 40%: Concentric Event Horizon Rings
+            const ringCount = 4;
+            const ringIndex = i % ringCount;
+            const radius = 10 + ringIndex * 3;
+            const angle = Math.random() * Math.PI * 2;
+            const thickness = 0.5;
+            p.set(
+                Math.cos(angle) * (radius + (Math.random()-0.5) * thickness),
+                Math.sin(angle) * (radius + (Math.random()-0.5) * thickness),
+                (Math.random()-0.5) * 1.5
+            );
+        } else {
+            // 20%: Floating Glyph Arcs
+            const segment = i % 5;
+            const radius = 22 + segment;
+            const startAngle = (segment * (Math.PI * 2) / 5) + (Date.now() * 0.0001);
+            const arcLength = 0.8;
+            const angle = startAngle + (Math.random() * arcLength);
+            p.set(Math.cos(angle)*radius, Math.sin(angle)*radius, (Math.random()-0.5) * 4);
+        }
+        return p;
+    },
+    /* 15. NEURAL BLOOM (The AI Mind) */
+    NeuralBloom(i) {
+        const p = new THREE.Vector3();
+        
+        // Split particles: 20% Nucleus (Core), 80% Axons (Neurons)
+        const isNucleus = i < P_COUNT * 0.2;
+
+        if (isNucleus) {
+            // THE NUCLEUS: A hyper-dense processing core
+            const u = Math.random(), v = Math.random();
+            const theta = 2 * Math.PI * u, phi = Math.acos(2 * v - 1);
+            // Core logic: Shimmering sphere
+            const r = Math.pow(Math.random(), 2) * 4; 
+            p.set(
+                r * Math.sin(phi) * Math.cos(theta),
+                r * Math.sin(phi) * Math.sin(theta),
+                r * Math.cos(phi)
+            );
+        } else {
+            // THE AXONS: Branching neuron tendrils
+            const branchId = i % 12; // Creates 12 main nerve fibers
+            const growthFactor = (i / P_COUNT); // How far along the branch the particle is
+            
+            // Branch shape math: Use golden-angle spirals and sine waves
+            const spiralRadius = growthFactor * 22;
+            const swirl = growthFactor * 10.0;
+            const angle = (branchId * Math.PI * 2 / 12) + swirl;
+            
+            const x = Math.cos(angle) * spiralRadius;
+            const y = Math.sin(angle) * spiralRadius;
+            const z = Math.sin(growthFactor * 15 + branchId) * 3;
+
+            // SYNAPTIC PULSE: Move some particles along the path
+            if (i % 15 === 0) {
+                // Synapse travel logic based on real-time
+                const flow = (Date.now() * 0.0015 + branchId) % 1.0;
+                const flowR = flow * 22;
+                const flowA = (branchId * Math.PI * 2 / 12) + (flow * 10.0);
+                p.set(
+                    Math.cos(flowA) * flowR,
+                    Math.sin(flowA) * flowR,
+                    Math.sin(flow * 15 + branchId) * 4 // Slightly offset height
+                );
+            } else {
+                p.set(x, y, z);
+            }
+
+            // Micro-tendril noise
+            const jitter = (Math.random() - 0.5) * 1.2;
+            p.x += jitter; p.y += jitter; p.z += jitter;
+        }
+
+        return p;
+    },
+    /* 16. GRAVITY WELL (The Event Horizon) */
+    GravityWell(i) {
+        const p = new THREE.Vector3();
+        
+        // Split: 85% Accretion Disk, 15% Hawking Radiation/Jets
+        const isDisk = i < P_COUNT * 0.85;
+
+        if (isDisk) {
+            // THE ACCRETION DISK
+            // Inverse distribution: More particles closer to the center
+            const distFactor = Math.pow(Math.random(), 2); 
+            const minBound = 5;  // The 'Shadow' radius
+            const maxBound = 30; // Outer disk reach
+            const r = minBound + distFactor * (maxBound - minBound);
+
+            // Spiral Physics: inner particles spin faster (Keplerian-ish)
+            const swirlSpeed = 8.0 / (distFactor + 0.2);
+            const theta = Math.random() * Math.PI * 2 + swirlSpeed;
+
+            // Frame Dragging: The disk is thin at edges, but warps/thickens at core
+            const thickness = (1.0 - distFactor) * 3.5;
+            const z = (Math.random() - 0.5) * thickness;
+
+            p.set(
+                Math.cos(theta) * r,
+                Math.sin(theta) * r,
+                z
+            );
+        } else {
+            // RELATIVISTIC JETS
+            // Vertical pillars of light escaping the well
+            const verticalReach = 40;
+            const z = (Math.random() - 0.5) * verticalReach;
+            
+            // The jet stays very tight near the axis
+            const jetRadius = 0.2 + (Math.abs(z) * 0.05);
+            const theta = Math.random() * Math.PI * 2;
+            
+            p.set(
+                Math.cos(theta) * jetRadius,
+                Math.sin(theta) * jetRadius,
+                z
+            );
+        }
+
+        return p;
+    },
+    /* 17. ORBITAL CITY (The Space Metropolis) */
+    OrbitalCity(i) {
+        const p = new THREE.Vector3();
+        
+        // Distribution: 15% Core Reactor, 60% Buildings, 25% Traffic Veins
+        const coreLimit = P_COUNT * 0.15;
+        const buildingLimit = P_COUNT * 0.75;
+
+        if (i < coreLimit) {
+            // THE POWER REACTOR: Dense glowing sun at the city center
+            const r = Math.pow(Math.random(), 2) * 4;
+            const t = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            p.set(
+                r * Math.sin(phi) * Math.cos(t),
+                r * Math.sin(phi) * Math.sin(t),
+                r * Math.cos(phi)
+            );
+        } else if (i < buildingLimit) {
+            // THE BUILDINGS: Monolithic blocks floating in organized shells
+            const blockId = i % 40; // Number of skyscraper monoliths
+            const layer = blockId % 3; // Inner, middle, or outer city ring
+            
+            // Positioning the base of the skyscraper
+            const ringRadius = 10 + layer * 6;
+            const orbitAngle = (blockId / 40) * Math.PI * 2;
+            const bx = Math.cos(orbitAngle) * ringRadius;
+            const bz = Math.sin(orbitAngle) * ringRadius;
+            
+            // Generating the vertical prism shape
+            const particlesPerBlock = (P_COUNT * 0.6) / 40;
+            const heightIndex = i % particlesPerBlock;
+            const progress = heightIndex / particlesPerBlock; // 0 to 1 along the building height
+            
+            const buildingH = 5 + (blockId % 7); // Random heights
+            const width = 1.2;
+            
+            p.set(
+                bx + (Math.random() - 0.5) * width,
+                (progress * buildingH) - (buildingH / 2),
+                bz + (Math.random() - 0.5) * width
+            );
+        } else {
+            // TRAFFIC VEINS: Fast-moving scan-lines/transport streams
+            const ringId = i % 3;
+            const radius = 13 + ringId * 6;
+            const flowSpeed = Date.now() * 0.002;
+            const angle = (i * 0.01) + flowSpeed; 
+            
+            // Add a "dash" effect (some particles skip segments)
+            const gap = Math.sin(i) > 0.5 ? radius : 0;
+            
+            p.set(
+                Math.cos(angle) * radius,
+                (Math.random() - 0.5) * 0.3, // Flat traffic plane
+                Math.sin(angle) * radius
+            );
+        }
+
+        return p;
     }
 };
 
